@@ -82,6 +82,12 @@ def get_subfield_values(tag,subfield,record):
 
 # * * * * * * * * * * * * * * * * * *
 
+def get_pub_date(record):
+    """return publication date based on 008 field if present"""
+
+    date = get_pymarc_field_value('008',record)[7:11].strip()
+    return int(date) if date else ""
+
 def get_original_language(record):
     """return original language code / 041$h"""
 
