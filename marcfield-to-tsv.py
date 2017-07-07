@@ -29,61 +29,81 @@ DATE_RANGE = []
 
 DATAFIELDS = [
 
-    {
-        "desc": "paratexts",
-        "tag": "520",
-        "headers": ["type","transcription","notes","position","vol"],
-        "codes": ["a","b","x","c","v"]
-    },
+    # {
+    #     "desc": "paratexts",
+    #     "tag": "520",
+    #     "headers": ["type","transcription","notes","position","vol"],
+    #     "codes": ["a","b","x","c","v"]
+    # },
+
+    # {
+    #     "desc": "epigraphs",
+    #     "tag": "591",
+    #     "codes": ["a","d","1","b","2","c","x","v"]
+    # },
+
+    # { 
+    #     "desc": "marginalia",
+    #     "tag": "595",
+    #     "codes": ["a","b","v","x"]
+    # },
+
+    # {
+    #     "desc": "inscriptions",
+    #     "tag": "594",
+    #     "codes": ["a","b","x","v"]
+    # },
+
+    # {
+    #     "desc": "authorship",
+    #     "tag": "599",
+    #     "codes": ["a","b","2","3","5","6","7"]
+    # },
+
+    # {
+    #     "desc": "translation",
+    #     "tag": "596",
+    #     "codes": ["a","b","c","d","e"]
+    # },
+
+    # {
+    #     "desc": "forms",
+    #     "tag": "592",
+    #     "codes": ["a","b","c","d"]
+    # },
 
     {
-        "desc": "epigraphs",
-        "tag": "591",
-        "codes": ["a","d","1","b","2","c","x","v"]
-    },
-
-    { 
-        "desc": "marginalia",
-        "tag": "595",
-        "codes": ["a","b","v","x"]
-    },
-
-    {
-        "desc": "inscriptions",
-        "tag": "594",
-        "codes": ["a","b","x","v"]
-    },
-
-    {
-        "desc": "authorship",
-        "tag": "599",
-        "codes": ["a","b","2","3","5","6","7"]
-    },
-
-    {
-        "desc": "translation",
-        "tag": "596",
-        "codes": ["a","b","c","d","e"]
-    },
-
-    {
-        "desc": "forms",
-        "tag": "592",
-        "codes": ["a","b","c","d"]
-    },
-
-    {
-        "desc": "title-pos-ne",
-        "tag": "989",
-        "headers": ["other works","nouns","adjectives","places","persons","verbs","material objects","adverbs"],
-        "codes": ["1","2","3","4","5","6","7","8"]
+        "desc": "epigraph-authors",
+        "tag": "700",
+        "codes": ["a","d","5"]
     }
+
+    # {
+    #     "desc": "title-pos-ne",
+    #     "tag": "989",
+    #     "headers": ["other works","nouns","adjectives","places","persons","verbs","material objects","adverbs"],
+    #     "codes": ["1","2","3","4","5","6","7","8"]
+    # }
 ]
 
 # * * * * * * * * * * * * * * * * * *
 
 def main(filename,out_filename=""):
 
+    def get_field_vol_values(field,codes,row):
+        """return dictionary of values based on current volume level field"""
+
+        def get_subfield_values_list(field,code):
+
+            values = []
+            for subfield in field.get_subfields(code):
+                values.append(subfield.replace('\\','').strip())
+
+            return values if values else ""
+
+        for code in codes: row[code] = get_subfield_values_list(field,code)
+
+        return row
 
     def field_to_tsv(field,collection):
 
@@ -124,7 +144,8 @@ def main(filename,out_filename=""):
                     for curr_field in curr_fields:
 
                         curr_row = curr_work
-                        curr_row = emx.get_field_vol_values(curr_field,field['codes'],curr_row)
+                        # curr_row = emx.get_field_vol_values(curr_field,field['codes'],curr_row)
+                        curr_row = get_field_vol_values(curr_field,field['codes'],curr_row)
 
                 return curr_row
 
@@ -132,6 +153,23 @@ def main(filename,out_filename=""):
 
                 curr_work = emx.get_work_metadata(record)
                 curr_fields = record.get_fields(field['tag'])
+
+                # if len(DATE_RANGE) < 2:
+
+                #     for curr_field in curr_fields:
+
+                #         relators = curr_field.get_subfields('4')
+
+                #         i = 0
+                #         for relator in relators:
+                #             relators[i] = relator.lower()
+                #             i += 1
+
+                #         if "author (epigraph)" in relators:
+
+                #             curr_row = get_curr_row(curr_fields,curr_work,field['tag'])
+                #             if curr_row: csv_writer.writerow(curr_row)
+                #         continue
 
                 if len(DATE_RANGE) < 2:
 
