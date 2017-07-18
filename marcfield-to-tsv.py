@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import csv
+import pprint
 import endmarcxml as emx
 from pymarc import marcxml,Record,Field
 from sys import argv
@@ -75,7 +76,7 @@ DATAFIELDS = [
     {
         "desc": "epigraph-authors",
         "tag": "700",
-        "codes": ["a","d","5"]
+        "codes": ["a","d","4","5"]
     }
 
     # {
@@ -154,20 +155,23 @@ def main(filename,out_filename=""):
                 curr_work = emx.get_work_metadata(record)
                 curr_fields = record.get_fields(field['tag'])
 
+                '''
+                
+                lines 160 - 171 are an alternate way of returning current row including relator conditional
+                created for epigraph author data subset and retained for demonstration
+                
+                '''
+                
                 # if len(DATE_RANGE) < 2:
+
+                #     epi_authors = []
 
                 #     for curr_field in curr_fields:
 
-                #         relators = curr_field.get_subfields('4')
+                #         if curr_field['4'] and 'author (epigraph)' in curr_field['4'].strip().lower():
 
-                #         i = 0
-                #         for relator in relators:
-                #             relators[i] = relator.lower()
-                #             i += 1
-
-                #         if "author (epigraph)" in relators:
-
-                #             curr_row = get_curr_row(curr_fields,curr_work,field['tag'])
+                #             epi_authors.append(curr_field)
+                #             curr_row = get_curr_row(epi_authors,curr_work,field['tag'])
                 #             if curr_row: csv_writer.writerow(curr_row)
                 #         continue
 
@@ -185,7 +189,7 @@ def main(filename,out_filename=""):
                     and int(curr_date) <= DATE_RANGE[1]:
 
                         curr_row = get_curr_row(curr_fields,curr_work,field['tag'])
-                        if curr_row: csv_writer.writerow(curr_row)
+                        # if curr_row: csv_writer.writerow(curr_row)
         return 0
 
     
